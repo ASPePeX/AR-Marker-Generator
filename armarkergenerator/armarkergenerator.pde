@@ -18,6 +18,8 @@ int exitAfterNumberOfMarkers;
 int markerCounter;
 int borderSize;
 
+String randomBatchName;
+
 void setup() {
   //Configure these values
   //actuale pixel size of the maker
@@ -44,12 +46,14 @@ void setup() {
   frameLimit = 200;
   
   //Exits after number of markers generated
-  exitAfterNumberOfMarkers = 3;
+  exitAfterNumberOfMarkers = 20;
   
   //Border in pixels in addition to the canvas size, borders ar blank white
   borderSize = 256;  
   
   //Only madness and despair past his line ...
+  
+  randomBatchName = str((int)random(10000000,99999999));
   overdrawX = width * overdraw;
   overdrawY = height * overdraw;
   fullwidth = width + 2*overdrawX;
@@ -65,6 +69,7 @@ void setup() {
     calcX = false;
     offsetmultiY = fullheight/fullwidth;
   }
+  println("Bulding " +  exitAfterNumberOfMarkers + " markers, batch name " + randomBatchName + ".");
 }
  
 void draw() {
@@ -112,7 +117,8 @@ void keyPressed() {
 }
 
 void SaveAndClear() {
-  String filename = str((int)random(10000000,99999999)) + ".png";
+  markerCounter++;
+  String filename = "marker-"+ randomBatchName + "-" + nf(markerCounter, 3) + ".png";
   
   int newwidth = width + 2*borderSize;
   int newheight = height + 2*borderSize;
@@ -127,14 +133,15 @@ void SaveAndClear() {
   newimg.save(savePath(filename));
   
   frameCounter = 0;
-  markerCounter++;
   
   if (exitAfterNumberOfMarkers <= markerCounter)
   {
+    println("All done!");
     exit();
   }
   else
   {
+    println("Done with marker " + markerCounter);
     clear();
   }
 }
