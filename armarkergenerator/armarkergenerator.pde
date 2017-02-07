@@ -1,4 +1,6 @@
 boolean calcX;
+boolean useColor;
+boolean useFrameLimit;
 float offsetmultiX = 1;
 float offsetmultiY = 1;
 
@@ -7,12 +9,47 @@ float overdrawY = 0;
 float fullwidth = 0;
 float fullheight = 0;
 
-void setup() {
-  //background(0);
-  size(2560, 512);
-  strokeWeight(10);
-  float overdraw = 0.2;
+float bwWhite = 0.5f;
+int frameCounter = 0;
+int frameLimit;
+int colorUpperLimit;
+int colorLowerLimit;
+int exitAfterNumberOfMarkers;
+int markerCounter;
+int borderSize;
 
+void setup() {
+  //Configure these values
+  //actuale pixel size of the maker
+  size(1024, 512);
+
+  //width of the lines
+  strokeWeight(15);
+
+  //how far points can go past the visible border in percent
+  float overdraw = 0.3;
+  
+  //colors or black/white
+  useColor = true;
+  
+  //Color limits to control overall color brightness
+  colorUpperLimit = 255;
+  colorLowerLimit = 224;
+
+  //How big a chance to draw white 0.75 would be 75% white (only for useColor = false)
+  bwWhite = 0.99f;
+  
+  //Stop after frameLimit number of frames and save the marker (else hit a button to save the current frame)
+  useFrameLimit = true;
+  frameLimit = 200;
+  
+  //Exits after number of markers generated
+  exitAfterNumberOfMarkers = 3;
+  
+  //Border in pixels in addition to the canvas size, borders ar blank white
+  borderSize = 256;  
+  
+  //Only madness and despair past his line ...
   overdrawX = width * overdraw;
   overdrawY = height * overdraw;
   fullwidth = width + 2*overdrawX;
@@ -31,12 +68,25 @@ void setup() {
 }
  
 void draw() {
-  float f = random(1);
-  if (f <= 0.93f)
-  {fill(255);}
-  else
-  {fill(0);}
+  frameCounter++;
   
+  float f = random(1);
+  
+  if (useColor)
+  {
+    fill(random(colorLowerLimit, colorUpperLimit), random(colorLowerLimit, colorUpperLimit), random(colorLowerLimit, colorUpperLimit));
+  }
+  else
+  {
+    if (f <= bwWhite)
+    {
+      fill(255);
+    }
+    else
+    {
+      fill(0);
+    }
+  }
   float offsetX = 0;
   float offsetY = 0;
   
@@ -47,10 +97,44 @@ void draw() {
   
   triangle(offsetX + random((fullwidth)/offsetmultiX)- overdrawX, offsetY + random((fullheight)/offsetmultiY) - overdrawY,
            offsetX + random((fullwidth)/offsetmultiX)- overdrawX, offsetY + random((fullheight)/offsetmultiY) - overdrawY,
-           offsetX + random((fullwidth)/offsetmultiX)- overdrawX, offsetY + random((fullheight)/offsetmultiY) - overdrawY); 
+           offsetX + random((fullwidth)/offsetmultiX)- overdrawX, offsetY + random((fullheight)/offsetmultiY) - overdrawY);
+           
+  if (useFrameLimit && frameLimit <= frameCounter)
+  {
+    SaveAndClear();
+  }
 }
 
 void keyPressed() {
-  saveFrame(str((int)random(10000000,99999999)));
+  if (!useFrameLimit) {
+    SaveAndClear();
+  }
+}
+
+void SaveAndClear() {
+  String filename = str((int)random(10000000,99999999)) + ".png";
+  
+  int newwidth = width + 2*borderSize;
+  int newheight = height + 2*borderSize;
+  
+  PImage oldimg = get();
   clear();
+  background(255);
+  
+  PImage newimg = get();
+  newimg.resize(newwidth, newheight);
+  newimg.set(borderSize, borderSize, oldimg);
+  newimg.save(savePath(filename));
+  
+  frameCounter = 0;
+  markerCounter++;
+  
+  if (exitAfterNumberOfMarkers <= markerCounter)
+  {
+    exit();
+  }
+  else
+  {
+    clear();
+  }
 }
