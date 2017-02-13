@@ -37,6 +37,7 @@ void setup() {
   
   randomBatchName = str((int)random(10000000,99999999));
   println("Bulding " +  exitAfterNumberOfMarkers + " markers, batch name " + randomBatchName + ".");
+  background(0);
 }
  
 void draw() {
@@ -52,7 +53,7 @@ void draw() {
     PVector p = new PVector(random(width), random(height));
     
     //Randoming fill color
-    fill(random(colorLowerLimit, colorUpperLimit));
+    fill(random(colorLowerLimit, colorUpperLimit),random(colorLowerLimit, colorUpperLimit),random(colorLowerLimit, colorUpperLimit));
   
     //Drawing the triangle
     triangle(a.x + p.x, a.y + p.y,
