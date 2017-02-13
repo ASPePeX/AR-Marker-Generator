@@ -1,17 +1,5 @@
-boolean calcX;
-boolean useColor;
-boolean useFrameLimit;
-float offsetmultiX = 1;
-float offsetmultiY = 1;
-
-float overdrawX = 0;
-float overdrawY = 0;
-float fullwidth = 0;
-float fullheight = 0;
-
-float bwWhite = 0.5f;
-int frameCounter = 0;
-int frameLimit;
+float triangleSize = 1;
+int triangleLimit;
 int colorUpperLimit;
 int colorLowerLimit;
 int exitAfterNumberOfMarkers;
@@ -23,97 +11,56 @@ String randomBatchName;
 void setup() {
   //Configure these values
   //actuale pixel size of the maker
-  size(1024, 512);
+  size(2500, 2500);
 
   //width of the lines
   strokeWeight(15);
 
-  //how far points can go past the visible border in percent
-  float overdraw = 0.3;
-  
-  //colors or black/white
-  useColor = true;
+  //triangle max size in pixel
+  triangleSize = 1200;
   
   //Color limits to control overall color brightness
   colorUpperLimit = 255;
   colorLowerLimit = 224;
 
-  //How big a chance to draw white 0.75 would be 75% white (only for useColor = false)
-  bwWhite = 0.99f;
-  
-  //Stop after frameLimit number of frames and save the marker (else hit a button to save the current frame)
-  useFrameLimit = true;
-  frameLimit = 200;
+  //Draw number of triangles per marker
+  triangleLimit = 250;
   
   //Exits after number of markers generated
   exitAfterNumberOfMarkers = 20;
   
   //Border in pixels in addition to the canvas size, borders ar blank white
-  borderSize = 256;  
+  borderSize = 0;  
+  
   
   //Only madness and despair past his line ...
   
   randomBatchName = str((int)random(10000000,99999999));
-  overdrawX = width * overdraw;
-  overdrawY = height * overdraw;
-  fullwidth = width + 2*overdrawX;
-  fullheight = height + 2*overdrawY;
-  
-  if (width >= height)
-  {
-    calcX = true;
-    offsetmultiX = fullwidth/fullheight;
-  }
-  else
-  {
-    calcX = false;
-    offsetmultiY = fullheight/fullwidth;
-  }
   println("Bulding " +  exitAfterNumberOfMarkers + " markers, batch name " + randomBatchName + ".");
 }
  
 void draw() {
-  frameCounter++;
   
-  float f = random(1);
-  
-  if (useColor)
+  for (int i = 0; i < triangleLimit; i++)
   {
-    fill(random(colorLowerLimit, colorUpperLimit), random(colorLowerLimit, colorUpperLimit), random(colorLowerLimit, colorUpperLimit));
-  }
-  else
-  {
-    if (f <= bwWhite)
-    {
-      fill(255);
-    }
-    else
-    {
-      fill(0);
-    }
-  }
-  float offsetX = 0;
-  float offsetY = 0;
+    //Randoming triangle corners, in their own relative coordinate system
+    PVector a = new PVector(random(-triangleSize/2, triangleSize/2), random(-triangleSize/2, triangleSize/2));
+    PVector b = new PVector(random(-triangleSize/2, triangleSize/2), random(-triangleSize/2, triangleSize/2));
+    PVector c = new PVector(random(-triangleSize/2, triangleSize/2), random(-triangleSize/2, triangleSize/2));
+    
+    //Randoming the center position on the canvas
+    PVector p = new PVector(random(width), random(height));
+    
+    //Randoming fill color
+    fill(random(colorLowerLimit, colorUpperLimit));
   
-  if (calcX)
-  {offsetX = random(fullwidth-fullwidth/offsetmultiX);}
-  else
-  {offsetY = random(fullheight-fullheight/offsetmultiY);}
+    //Drawing the triangle
+    triangle(a.x + p.x, a.y + p.y,
+             b.x + p.x, b.y + p.y,
+             c.x + p.x, c.y + p.y); 
+  }
   
-  triangle(offsetX + random((fullwidth)/offsetmultiX)- overdrawX, offsetY + random((fullheight)/offsetmultiY) - overdrawY,
-           offsetX + random((fullwidth)/offsetmultiX)- overdrawX, offsetY + random((fullheight)/offsetmultiY) - overdrawY,
-           offsetX + random((fullwidth)/offsetmultiX)- overdrawX, offsetY + random((fullheight)/offsetmultiY) - overdrawY);
-           
-  if (useFrameLimit && frameLimit <= frameCounter)
-  {
-    SaveAndClear();
-  }
-}
-
-void keyPressed() {
-  if (!useFrameLimit) {
-    SaveAndClear();
-  }
+  SaveAndClear();
 }
 
 void SaveAndClear() {
@@ -131,8 +78,6 @@ void SaveAndClear() {
   newimg.resize(newwidth, newheight);
   newimg.set(borderSize, borderSize, oldimg);
   newimg.save(savePath(filename));
-  
-  frameCounter = 0;
   
   if (exitAfterNumberOfMarkers <= markerCounter)
   {
