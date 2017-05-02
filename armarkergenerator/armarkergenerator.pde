@@ -5,6 +5,7 @@ int colorLowerLimit;
 int exitAfterNumberOfMarkers;
 int markerCounter;
 int borderSize;
+color backgroundClearColor;
 
 String randomBatchName;
 
@@ -32,12 +33,14 @@ void setup() {
   //Border in pixels in addition to the canvas size, borders ar blank white
   borderSize = 0;  
   
+  //Background clear color
+  backgroundClearColor = 255;
   
   //Only madness and despair past his line ...
   
   randomBatchName = str((int)random(10000000,99999999));
   println("Bulding " +  exitAfterNumberOfMarkers + " markers, batch name " + randomBatchName + ".");
-  background(0);
+  background(backgroundClearColor);
 }
  
 void draw() {
@@ -73,7 +76,7 @@ void SaveAndClear() {
   
   PImage oldimg = get();
   clear();
-  background(255);
+  background(backgroundClearColor);
   
   PImage newimg = get();
   newimg.resize(newwidth, newheight);
@@ -89,5 +92,6 @@ void SaveAndClear() {
   {
     println("Done with marker " + markerCounter);
     clear();
+    background(backgroundClearColor);
   }
 }
